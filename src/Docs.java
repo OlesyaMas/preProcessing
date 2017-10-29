@@ -14,7 +14,7 @@ public class Docs {
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-			FileInputStream fis = new FileInputStream (new File("patient_los.xlsx"));
+			FileInputStream fis = new FileInputStream (new File("data/patient_los.xlsx"));
 			
 			//create workbook instance
 			XSSFWorkbook wb = new XSSFWorkbook(fis);
