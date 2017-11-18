@@ -34,13 +34,19 @@ import javax.swing.JTabbedPane;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 
 public class ProcI {
 
 	private JFrame frame;
 	private JTextField textField;
 	JFileChooser fileChooser = new JFileChooser();
-
+	static String inputFileFullName = "D:\\study\\java_proj\\test\\Книга1_1000.xlsx";
+	static String outputFile = "D:\\study\\java_proj\\test\\Книга1_out_test.xlsx";
+	//private final Action action = new SwingAction();
+	
 	/**
 	 * Launch the application.
 	 */
@@ -83,6 +89,8 @@ public class ProcI {
 		 fileChooser.setVisible(true);
 		
 		JButton btnNewButton = new JButton("\u0410\u043D\u0430\u043B\u0456\u0437\u0443\u0432\u0430\u0442\u0438");
+		btnNewButton.addActionListener(new ProcessFileHandler());
+		
 		btnNewButton.setForeground(new Color(128, 0, 0));
 		btnNewButton.setBackground(UIManager.getColor("ToolTip.background"));
 		btnNewButton.setFont(new Font("Sitka Text", Font.BOLD, 14));
@@ -135,34 +143,8 @@ public class ProcI {
 		frame.getContentPane().add(label_2);
 		
 		JButton button_1 = new JButton("\u0417\u0430\u0432\u0430\u043D\u0442\u0430\u0436\u0438\u0442\u0438 \u0444\u0430\u0439\u043B");
-		button_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				System.out.println("Load is pressed");
-				int returnVal = fileChooser.showOpenDialog(frame);
-				/*Docs importDocs = new Docs();
-				importDocs.*/
-	            //int returnVal = chooser.showOpenDialog(chooser);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File inputFile = fileChooser.getSelectedFile();
-					//TODO move to Docs read file + show message in label	
-					try {
-							try {
-								Docs.readFile(inputFile);
-							} catch (FileNotFoundException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							} catch (IOException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-						} catch (InvalidFormatException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-				}
-			}
-		});
+		button_1.addActionListener(new LoadFileHandler());
+		
 		button_1.setForeground(new Color(128, 0, 0));
 		button_1.setFont(new Font("Sitka Text", Font.BOLD, 14));
 		button_1.setBackground(SystemColor.info);
@@ -175,5 +157,70 @@ public class ProcI {
 		button_2.setBackground(SystemColor.info);
 		button_2.setBounds(616, 355, 173, 33);
 		frame.getContentPane().add(button_2);
+		
+		JCheckBox cbAverage = new JCheckBox("\u0417\u0430\u043C\u0456\u043D\u0430 \u043D\u0430 \u0441\u0435\u0440\u0435\u0434\u043D\u0454");
+		cbAverage.addActionListener(new calcAverageHandler());
+		//cbAverage.setAction(action);
+		cbAverage.setBounds(301, 225, 155, 23);
+		frame.getContentPane().add(cbAverage);
+	}
+	
+	
+	private final class calcAverageHandler implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			JCheckBox cbAverage = (JCheckBox)e.getSource();
+			if(cbAverage.isSelected()){
+				//JOptionPane.showMessageDialog(frame, "JCheckBox is selected");
+				ProcDocs.CALC_AVERAGE = true;
+			}else{
+				//JOptionPane.showMessageDialog(frame, "JCheckBox is NOT selected");
+				ProcDocs.CALC_AVERAGE = false;
+			}
+		}
+	}
+
+
+	private final class LoadFileHandler implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			
+			System.out.println("Load is pressed");
+			int returnVal = fileChooser.showOpenDialog(frame);
+			/*Docs importDocs = new Docs();
+			importDocs.*/
+		    //int returnVal = chooser.showOpenDialog(chooser);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File inputFile = fileChooser.getSelectedFile();
+				//TODO move to Docs read file + show message in label
+				inputFileFullName = inputFile.getAbsolutePath().toString();
+			}
+		}
+	}
+
+
+	private final class ProcessFileHandler implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			try {
+				//Docs.readFile(inputFile);
+				ProcDocs.readFromExcel(inputFileFullName, outputFile);								
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			} catch (Exception e3) {
+				// TODO Auto-generated catch block
+				e3.printStackTrace();
+			}
+			System.out.println("File completed !!!!!!!!!!!!!!!!!!!!!!!!!");
+		}
+	}
+	private class SwingAction extends AbstractAction {
+		public SwingAction() {
+			putValue(NAME, "SwingAction");
+			putValue(SHORT_DESCRIPTION, "Some short description");
+		}
+		public void actionPerformed(ActionEvent e) {
+		}
 	}
 }
