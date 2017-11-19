@@ -235,11 +235,12 @@ public class ProcDocs {
 		    	    //cell.getCellStyle().setWrapText(false);
              }
         }
-//        if(DELETE_EMPTY){
-//    		for (Integer rowInd : rowsToRemove) {
-//    			removeRow(mySheet, rowInd);
-//    		}
-//        }
+
+        if(DELETE_EMPTY){
+    		for (Integer rowInd : rowsToRemove) {
+    			removeRow(mySheet, rowInd);
+    		}
+        }
         
         saveNew();
         	
