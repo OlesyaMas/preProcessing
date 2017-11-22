@@ -45,7 +45,7 @@ import lesya.maslyuk.gmail.com.model.MaxValue;
 import lesya.maslyuk.gmail.com.model.MinValue;
 import lesya.maslyuk.gmail.com.utils.MyUtils;
 
-public class ProcDocs {
+public class Processing {
 	
 	private static final int MIN_MAX_LOWER = 5;
 	private static final int FIRST_ROW = 1;
@@ -55,8 +55,8 @@ public class ProcDocs {
 	private static final int SHIFT_FORMULA_ROW = 10;
 	private static final int PROCEED_ROWS = 10;
 	public static boolean DELETE_EMPTY = false;
-	public static boolean CALC_AVERAGE = true;
-	public static boolean REMOVE_MIN_MAX = true;
+	public static boolean CALC_AVERAGE = false;
+	public static boolean REMOVE_MIN_MAX = false;
 	
 	///private static Map<Integer,Row> rowMap = new HashMap<Integer,Row>();
 	private static DataFormatter objDefaultFormat = new DataFormatter();
@@ -115,8 +115,8 @@ public class ProcDocs {
 
 	
 	public static void readFromExcel(String inputFile, String outputFile) throws Exception{
-		ProcDocs.inputFile = inputFile;
-		ProcDocs.outputFile = outputFile;
+		Processing.inputFile = inputFile;
+		Processing.outputFile = outputFile;
 		
 		myWorkBook = new XSSFWorkbook (new FileInputStream(inputFile)); // Return first sheet from the XLSX workbook
 		mySheet = myWorkBook.getSheetAt(0);

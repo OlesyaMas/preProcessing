@@ -103,32 +103,28 @@ public class ProcI {
 		
 		JCheckBox chckbxNewCheckBox = new JCheckBox("\u041A\u043E\u0434\u0443\u0432\u0430\u043D\u043D\u044F \u044F\u043A\u0456\u0441\u043D\u0438\u0445 \u0437\u043D\u0430\u0447\u0435\u043D\u044C");
 		chckbxNewCheckBox.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		chckbxNewCheckBox.setBounds(74, 262, 213, 23);
+		chckbxNewCheckBox.setBounds(489, 314, 213, 23);
 		frame.getContentPane().add(chckbxNewCheckBox);
 		
 		JCheckBox checkBox = new JCheckBox("\u0410\u043D\u0430\u043B\u0456\u0437 \u0434\u0443\u0431\u043B\u044E\u044E\u0447\u0438\u0445 \u0440\u044F\u0434\u043A\u0456\u0432");
 		checkBox.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		checkBox.setBounds(527, 307, 195, 23);
+		checkBox.setBounds(489, 275, 195, 23);
 		frame.getContentPane().add(checkBox);
 		
-		JCheckBox checkBox_1 = new JCheckBox("\u0417\u0430\u043C\u0456\u043D\u0430 \u043F\u0440\u043E\u043F\u0443\u0449\u0435\u043D\u0438\u0445 \u0437\u043D\u0430\u0447\u0435\u043D\u044C");
-		checkBox_1.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		checkBox_1.setBounds(74, 307, 195, 23);
-		frame.getContentPane().add(checkBox_1);
-		
-		JCheckBox checkBox_2 = new JCheckBox("\u0412\u0438\u0434\u0430\u043B\u0435\u043D\u043D\u044F \u0430\u0443\u0442\u043B\u0430\u0439\u043D\u0456\u0432");
-		checkBox_2.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		checkBox_2.setBounds(527, 262, 173, 23);
-		frame.getContentPane().add(checkBox_2);
+		JCheckBox cbRemoveMinMax = new JCheckBox("\u0412\u0438\u0434\u0430\u043B\u0435\u043D\u043D\u044F \u0430\u0443\u0442\u043B\u0430\u0439\u043D\u0456\u0432 (Min/Max)");
+		cbRemoveMinMax.addActionListener(new RemoveMinMaxHandler());
+		cbRemoveMinMax.setFont(new Font("Tahoma", Font.BOLD, 11));
+		cbRemoveMinMax.setBounds(74, 270, 260, 23);
+		frame.getContentPane().add(cbRemoveMinMax);
 		
 		JCheckBox checkBox_3 = new JCheckBox("\u0410\u043D\u0430\u043B\u0456\u0437 \u043D\u0435\u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u043D\u043E\u0441\u0442\u0435\u0439 \u0444\u043E\u0440\u043C\u0430\u0442\u0443");
 		checkBox_3.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		checkBox_3.setBounds(301, 262, 235, 23);
+		checkBox_3.setBounds(489, 228, 235, 23);
 		frame.getContentPane().add(checkBox_3);
 		
 		JCheckBox checkBox_4 = new JCheckBox("\u0410\u043D\u043E\u043D\u0456\u043C\u0456\u0437\u0430\u0446\u0456\u044F \u0434\u0430\u043D\u0438\u0445");
 		checkBox_4.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		checkBox_4.setBounds(301, 307, 195, 23);
+		checkBox_4.setBounds(489, 189, 195, 23);
 		frame.getContentPane().add(checkBox_4);
 		
 		JLabel label = new JLabel("\u0412\u043A\u0430\u0436\u0456\u0442\u044C \u0448\u043B\u044F\u0445 \u0434\u043E \u0444\u0430\u0439\u043B\u0443:");
@@ -143,7 +139,7 @@ public class ProcI {
 		label_2.setMaximumSize(new Dimension(124, 14));
 		label_2.setFont(new Font("Candara", Font.BOLD, 16));
 		label_2.setBackground(Color.ORANGE);
-		label_2.setBounds(74, 229, 167, 14);
+		label_2.setBounds(74, 194, 167, 14);
 		frame.getContentPane().add(label_2);
 		
 		JButton button_1 = new JButton("\u0417\u0430\u0432\u0430\u043D\u0442\u0430\u0436\u0438\u0442\u0438 \u0444\u0430\u0439\u043B");
@@ -162,27 +158,56 @@ public class ProcI {
 		button_2.setBounds(616, 355, 173, 33);
 		frame.getContentPane().add(button_2);
 		
-		JCheckBox cbAverage = new JCheckBox("\u0417\u0430\u043C\u0456\u043D\u0430 \u043D\u0430 \u0441\u0435\u0440\u0435\u0434\u043D\u0454");
-		cbAverage.addActionListener(new calcAverageHandler());
+		JCheckBox cbAverage = new JCheckBox("\u0417\u0430\u043C\u0456\u043D\u0430 \u043F\u0440\u043E\u043F\u0443\u0449\u0435\u043D\u0438\u0445 \u0437\u043D\u0430\u0447\u0435\u043D\u044C \u043D\u0430 \u0441\u0435\u0440\u0435\u0434\u043D\u0454");
+		cbAverage.setFont(new Font("Tahoma", Font.BOLD, 11));
+		cbAverage.addActionListener(new CalcAverageHandler());
 		//cbAverage.setAction(action);
-		cbAverage.setBounds(301, 225, 155, 23);
+		cbAverage.setBounds(74, 224, 282, 23);
 		frame.getContentPane().add(cbAverage);
+		
+		JCheckBox cbRemoveEmptyCells = new JCheckBox("\u0412\u0438\u0434\u0430\u043B\u0435\u043D\u043D\u044F \u0440\u044F\u0434\u043A\u0456\u0432 \u0437 \u043F\u0443\u0441\u0442\u0438\u043C\u0438 \u044F\u0447\u0435\u0439\u043A\u0430\u043C\u0438");
+		cbRemoveEmptyCells.setFont(new Font("Tahoma", Font.BOLD, 11));
+		cbRemoveEmptyCells.addActionListener(new RemoveEmptyHandler());
+		cbRemoveEmptyCells.setBounds(74, 310, 282, 23);
+		frame.getContentPane().add(cbRemoveEmptyCells);
 	}
 	
 	
-	private final class calcAverageHandler implements ActionListener {
+	private final class CalcAverageHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox cbAverage = (JCheckBox)e.getSource();
 			if(cbAverage.isSelected()){
 				//JOptionPane.showMessageDialog(frame, "JCheckBox is selected");
-				ProcDocs.CALC_AVERAGE = true;
+				Processing.CALC_AVERAGE = true;
 			}else{
 				//JOptionPane.showMessageDialog(frame, "JCheckBox is NOT selected");
-				ProcDocs.CALC_AVERAGE = false;
+				Processing.CALC_AVERAGE = false;
 			}
 		}
 	}
 
+	private final class RemoveEmptyHandler implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			JCheckBox cbRemoveEmptyCells = (JCheckBox)e.getSource();
+			if(cbRemoveEmptyCells.isSelected()){
+				Processing.DELETE_EMPTY = true;
+			}else{
+				Processing.DELETE_EMPTY = false;
+			}
+		}
+	}
+	
+	private final class RemoveMinMaxHandler implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			JCheckBox cbRemoveMinMax = (JCheckBox)e.getSource();
+			if(cbRemoveMinMax.isSelected()){
+				Processing.REMOVE_MIN_MAX = true;
+			}else{
+				Processing.REMOVE_MIN_MAX = false;
+			}
+		}
+	}
+	
 
 	private final class LoadFileHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
@@ -205,7 +230,7 @@ public class ProcI {
 		public void actionPerformed(ActionEvent e) {
 			try {
 				//Docs.readFile(inputFile);
-				ProcDocs.readFromExcel(inputFileFullName, outputFile);								
+				Processing.readFromExcel(inputFileFullName, outputFile);								
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
