@@ -45,6 +45,10 @@ public class ProcI {
 	JFileChooser fileChooser = new JFileChooser();
 	static String inputFileFullName = "D:\\study\\java_proj\\test\\Книга1_1000.xlsx";
 	static String outputFile = "D:\\study\\java_proj\\test\\Книга1_out_test.xlsx";
+	
+	///static String inputFileFullName = "D:\\study\\java_proj\\data\\xls\\Книга1_200.xls";
+	///static String outputFile = "D:\\study\\java_proj\\data\\xls\\Книга1_200_out.xls";
+	
 	//private final Action action = new SwingAction();
 	
 	/**

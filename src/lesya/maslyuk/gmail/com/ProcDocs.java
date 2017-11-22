@@ -13,7 +13,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NavigableSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
@@ -30,6 +33,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -37,18 +41,22 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import lesya.maslyuk.gmail.com.model.ColumnAttr;
 import lesya.maslyuk.gmail.com.model.ColumnType;
+import lesya.maslyuk.gmail.com.model.MaxValue;
+import lesya.maslyuk.gmail.com.model.MinValue;
 import lesya.maslyuk.gmail.com.utils.MyUtils;
 
 public class ProcDocs {
 	
+	private static final int MIN_MAX_LOWER = 5;
 	private static final int FIRST_ROW = 1;
-	private static int lastRowNum = 0;
+	//private static int lastRowNum = 0;
 	private static final String COLUMN_CODE = "_code";
 	private static final int TITLE_ROW_NUM = 0;	//in Excel #1
-	private static final int SHIFT_FORMULA_ROW = 2;
+	private static final int SHIFT_FORMULA_ROW = 10;
 	private static final int PROCEED_ROWS = 10;
 	public static boolean DELETE_EMPTY = false;
-	public static boolean CALC_AVERAGE = false;
+	public static boolean CALC_AVERAGE = true;
+	public static boolean REMOVE_MIN_MAX = true;
 	
 	///private static Map<Integer,Row> rowMap = new HashMap<Integer,Row>();
 	private static DataFormatter objDefaultFormat = new DataFormatter();
@@ -63,10 +71,15 @@ public class ProcDocs {
 
 	//String inputFile = "D:\\Dev\\neon_ws\\OlesyaPrj\\data\\InputDocs1.xls";
 	///static String inputFile = "D:\\study\\java_proj\\DataProc\\data\\ ÌË„‡1_int-1.xlsx";
-	static String inputFile = "D:\\study\\java_proj\\DataProc\\data\\ ÌË„‡1_1000.xlsx";
-	static String outputFile = "D:\\study\\java_proj\\DataProc\\data\\ ÌË„‡1_out_test.xlsx";
+	//static String inputFile = "D:\\study\\java_proj\\test\\ ÌË„‡1_200.xlsx";
+	//static String outputFile = "D:\\study\\java_proj\\test\\ ÌË„‡1_200_out.xlsx";
+	static SortedSet<Integer> rowsToRemove = new TreeSet<Integer>();
 	
-/*	public static void main(String[] args) {
+	static String inputFile;
+	static String outputFile;
+	
+	
+	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		System.out.println("ProcDocs.main()");
 		try {
@@ -74,18 +87,32 @@ public class ProcDocs {
 			myWorkBook = new XSSFWorkbook (new FileInputStream(inputFile)); // Return first sheet from the XLSX workbook
 			mySheet = myWorkBook.getSheetAt(0);
 			
-			lastRowNum = mySheet.getLastRowNum();
-			System.out.println("lastRowNum=" + lastRowNum);
+			System.out.println("lastRowNum=" + mySheet.getLastRowNum());
 			
-			readFromExcel(inputFile);
+			//TO USE
+			//stayleOrigin.getDataFormat()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			
+			//removeRow(mySheet, mySheet.getLastRowNum());
+			//removeRow(mySheet, mySheet.getLastRowNum() - 10);
+			//for (Row row : mySheet) {
+			//	for (Cell cell : row){
+			//		cell.setCellStyle(stayleOrigin);
+			//	}
+			//}
+			
+			readFromExcel(inputFile, outputFile);
 			//System.out.println("rowMap.size()=" + rowMap.size());
+			
+			//saveNew();
+			
+			//myWorkBook.close();
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-*/
+
 	
 	public static void readFromExcel(String inputFile, String outputFile) throws Exception{
 		ProcDocs.inputFile = inputFile;
@@ -94,8 +121,7 @@ public class ProcDocs {
 		myWorkBook = new XSSFWorkbook (new FileInputStream(inputFile)); // Return first sheet from the XLSX workbook
 		mySheet = myWorkBook.getSheetAt(0);
 		
-		lastRowNum = mySheet.getLastRowNum();
-		System.out.println("lastRowNum=" + lastRowNum);
+		System.out.println("lastRowNum=" + mySheet.getLastRowNum());
 		
 		
 //        HSSFWorkbook myExcelBook = new HSSFWorkbook(new FileInputStream(file));
@@ -129,14 +155,6 @@ public class ProcDocs {
         		continue;
         	}
         	
-        	//TODO fix First 1000
-        	//if (firstLine == PROCEED_ROWS)
-        	//	break;
-
-        	//System.out.print("row.getRowNum()=" + row.getRowNum() + "||");
-        	//rowMap.put(row.getRowNum(), row);
-        	
-        	//defineTypes
             defineColumnTypes(row);
             System.out.println();
         }
@@ -158,9 +176,46 @@ public class ProcDocs {
 			}
 	    }
 */
+        
+        if(REMOVE_MIN_MAX){
+        	System.out.println("DEBUG 110 processing min/max");
+	        for (Row row : mySheet) {
+	        	int zeroLine = row.getRowNum();
+	        	if (zeroLine == 0)
+	        		continue;
+	        	
+	        	for (Cell cell : row) {                	
+	    			String columnName = indexMap.get(cell.getColumnIndex());
+	    			if(columnName != null){	//skip columns with empty title
+	    		    	ColumnAttr columnAttr = attrMap.get(columnName);
+			    		if(!MyUtils.isCellEmpty(cell) && columnAttr.isColNumCalculatable()){
+					    	fillMinMax(row, cell, columnAttr);		    			
+			    		}
+	    			}
+	    		}            
+	        }
+	        
+			for (Cell cell : titleRow){
+				int curColumnIndex = cell.getColumnIndex();
+				String columnName = indexMap.get(curColumnIndex);            	
+				if(columnName != null){	//skip columns with empty title
+					ColumnAttr columnAttr = attrMap.get(columnName);
+					System.out.println("DEBUG XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX " + columnName);
 
+			    	if(columnAttr.isMinMaxRemovingApplicable()){
+			    		rowsToRemove.add(columnAttr.getMinValue().getRowNum());
+			    		rowsToRemove.add(columnAttr.getMaxValue().getRowNum());
+			    		System.out.println("DEBUG 112 MIN:" + columnAttr.getMinValue().toString());
+			    		System.out.println("DEBUG 113 MAX:" + columnAttr.getMaxValue().toString());
+			    	}
+			    }
+			}
+	        removeEmptyRows();
+        }
+
+			    	
         /*
-         * Calculate average for DECIMAL
+         * for DECIMAL
          */
         if(CALC_AVERAGE)
         	calcAverage(titleRow);
@@ -168,16 +223,9 @@ public class ProcDocs {
         int lastColumn = titleRow.getLastCellNum();
         System.out.println("DEBUG:0: row.getLastCellNum()=" + lastColumn);
         
-        LinkedList<Integer> rowsToRemove = new LinkedList<Integer>();
         for (Row row : mySheet) {
         	int curRowIndex = row.getRowNum();
-        	if (curRowIndex == 0){
-        		continue;
-        	}
-//        	if (curRowIndex == 1){
-//            	//Row oneRow = mySheet.getRow(FIRST_ROW);
-//                CellStyle currentStyle = row.get .getCellStyle();        
-//        	}
+        	if (curRowIndex == 0) continue;
         	System.out.println("DEBUG:000000000000000000000000000000000000000000000): row.getRowNum()=" + row.getRowNum());
         	
         	//CREATE_NULL_AS_BLANK vs Row.RETURN_BLANK_AS_NULL
@@ -191,24 +239,16 @@ public class ProcDocs {
     		    	ColumnType curColType = columnAttr.getColumnType();
     		    	System.out.println("DEBUG:2: curColType =" + curColType);
     		    	
-	                Cell cell = row.getCell(ci, Row.CREATE_NULL_AS_BLANK);
+	                Cell cell = row.getCell(ci, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); 
 	                CellStyle currentStyle = columnAttr.getCellStyle(); 
 	                if (MyUtils.isCellEmpty(cell)) {
-	                   // The spreadsheet is empty in this cell
     		    		System.out.println("DEBUG:3: Cell is empty !!!!!!!!!!!!!!!!!!!!!!!");
 
     		    		if(CALC_AVERAGE){
-        		    		if(curColType == ColumnType.DECIMAL || (curColType == ColumnType.INTEGER && !columnAttr.isColumnOrdinal())){
+        		    		if(columnAttr.isColNumCalculatable()){
             		    		System.out.println("DEBUG:44: = set CELL VALUE: columnAttr.getAverage()" + columnAttr.getAverage());
             		    		
-            		    		//Cell cellNew = row.createCell(ci);
-            		    		//cellNew.setCellType(XSSFCell.CELL_TYPE_NUMERIC);
-            		    		//cellNew.setCellValue(columnAttr.getAverage());
-            		    		
-            		    		//Cell cell = row.getCell(2);
-            		    	    //if (cell == null) {
-            		    	        cell = row.createCell(ci);
-            		    	    //}
+            		    	    cell = row.createCell(ci);
             		    	    cell.setCellType(Cell.CELL_TYPE_NUMERIC);
             		    	    cell.setCellStyle(currentStyle);
             		    	    cell.getCellStyle().setWrapText(false);
@@ -219,27 +259,19 @@ public class ProcDocs {
     		    		if(DELETE_EMPTY){
         		    		System.out.println("DEBUG:5: Cell will be deleted !!! " + curRowIndex);
         		    		if(!rowsToRemove.contains(curRowIndex))
-        		    			rowsToRemove.addFirst(curRowIndex);
+        		    			rowsToRemove.add(curRowIndex);
         		    		
         		    		//TODO use this to performence (if empty cell => the other cells stay empty !!!)
-        		            //if(DELETE_EMPTY){
         		            //	break cycleCell;
-        		            //}
         		    	}
-    		    		//TODO other fixes
-    		    		
 	                }
 	    		}
-                    // Do something useful with the cell's contents
-                	//cell.setCellStyle(currentStyle);
-		    	    //cell.getCellStyle().setWrapText(false);
+                //Do something useful with the cell's contents
              }
         }
 
         if(DELETE_EMPTY){
-    		for (Integer rowInd : rowsToRemove) {
-    			removeRow(mySheet, rowInd);
-    		}
+        	removeEmptyRows();
         }
         
         saveNew();
@@ -248,37 +280,48 @@ public class ProcDocs {
     }
 
 
+	private static void removeEmptyRows() {
+		NavigableSet<Integer> rowsToRemove_nav = ((TreeSet)rowsToRemove).descendingSet();	//because shifting from last rows
+		for (Integer rowInd : rowsToRemove_nav) {
+			System.out.println("DEBUG: 101 : will be removed rowInd =" + rowInd);
+			removeRow(mySheet, rowInd);
+		}
+		
+		for (Row row : mySheet) {
+			for (Cell cell : row){
+	        	int curRowIndex = row.getRowNum();
+	        	if (curRowIndex == 0) continue;
+
+	        	int curColumnIndex = cell.getColumnIndex();
+				String columnName = indexMap.get(curColumnIndex);            	
+				if(columnName != null){	//skip columns with empty title
+					ColumnAttr columnAttr = attrMap.get(columnName);
+					cell.setCellStyle(columnAttr.getCellStyle());
+					cell.getCellStyle().setWrapText(false);
+				}
+			}
+		}
+	}
+	
+	
 	private static void calcAverage(Row titleRow) throws Exception {
 		//Row titleRow = mySheet.getRow(0);
 		//Row oneRow = mySheet.getRow(FIRST_ROW);
 		//Row lastRow = mySheet.getRow(lastRowNum);
+		int lastRowNum = mySheet.getLastRowNum();
 		XSSFRow rowResult = mySheet.createRow(lastRowNum + SHIFT_FORMULA_ROW);
+		System.out.println("------------- XSSFRow rowResult.getRowNum() " + rowResult.getRowNum());
+		XSSFFormulaEvaluator evaluator = myWorkBook.getCreationHelper().createFormulaEvaluator();
+		evaluator.clearAllCachedResultValues();
 		
 		for (Cell cell : titleRow){
 			int curColumnIndex = cell.getColumnIndex();
 			String columnName = indexMap.get(curColumnIndex);            	
 			if(columnName != null){	//skip columns with empty title
 				ColumnAttr columnAttr = attrMap.get(columnName);
-		    	if(columnAttr.getColumnType() == ColumnType.DECIMAL || (columnAttr.getColumnType() == ColumnType.INTEGER && !columnAttr.isColumnOrdinal())){
+		    	if(columnAttr.isColNumCalculatable()){
 		    		System.out.println("------------- for column " + columnName);
-		    		
-		    		//Cell cellBeginRange = oneRow.getCell(curColumnIndex);
-		    		
-		    		Double avg = null;
-		    		//if(columnAttr.getTypeMap().get(ColumnType.DECIMAL) > 1){
-		        		//Cell endRange = lastRow.getCell(curColumnIndex);
-		    
-		        		//if(cellBeginRange == null)
-		        		//	throw new Exception("DEBUG: cellBeginRange is null");
-
-		        		//if(endRange == null)
-		        			//throw new Exception("DEBUG: endRange is null");
-		        		
-		        		avg = avg(mySheet, myWorkBook,curColumnIndex, rowResult);
-
-//                		}else{
-//                    		avg = avg(mySheet, myWorkBook, cellBeginRange, cellBeginRange);
-		    		//}
+		    		Double avg = averageByColumn(mySheet, myWorkBook,curColumnIndex, lastRowNum, rowResult, evaluator);
 		        		
 		        	if(columnAttr.getColumnType() == ColumnType.INTEGER){
 		        		int intAvg = (int)Math.round(avg);
@@ -286,14 +329,17 @@ public class ProcDocs {
 		        	}else{
 		        		columnAttr.setAverage(avg);
 		        	}
-		        	
-		    		                		
 		    		System.out.println("AVERAGE for column " + columnName + " : " + columnAttr.getAverage());
 		    	}
 		    }
 		}
 		mySheet.removeRow(rowResult);
 	}
+
+
+//	private static boolean isColumnCalculatable(ColumnAttr columnAttr) {
+//		return columnAttr.getColumnType() == ColumnType.DECIMAL || (columnAttr.getColumnType() == ColumnType.INTEGER && !columnAttr.isColumnOrdinal());
+//	}
 
 
 	private static void defineColumnTypes(Row row) throws Exception {
@@ -315,6 +361,29 @@ public class ProcDocs {
 	}
 
 
+	private static void fillMinMax(Row row, Cell cell, ColumnAttr columnAttr) {
+		
+		if(columnAttr.isColNumCalculatable()){
+			System.out.println("DEBUG 103: " + cell.getCellType() + " #############");
+			Double numericCellValue = cell.getNumericCellValue();
+			int rowNum = row.getRowNum();
+			if(columnAttr.getMinValue() == null && columnAttr.getMaxValue() == null){
+				System.out.print("DEBUG 104: ");
+				 columnAttr.setMinValue(new MinValue(rowNum, numericCellValue));
+				 columnAttr.setMaxValue(new MaxValue(rowNum, numericCellValue));
+			 }else if(numericCellValue < columnAttr.getMinValue().getValue()){
+				 System.out.print("DEBUG 105: ");
+				 columnAttr.getMinValue().setValue(numericCellValue);
+				 columnAttr.getMinValue().setRowNum(rowNum);
+			 }else if(numericCellValue > columnAttr.getMaxValue().getValue()){
+				 System.out.print("DEBUG 106: ");
+				 columnAttr.getMaxValue().setValue(numericCellValue);
+				 columnAttr.getMaxValue().setRowNum(rowNum);
+			 } 
+		}
+	}
+
+
 	private static void defineTitleMap(Row row) {
 		for (Cell cell : row){
 			objFormulaEvaluator.evaluate(cell); // This will evaluate the cell, And any type of cell will return string value
@@ -332,21 +401,6 @@ public class ProcDocs {
 		}
 	}
 
-/*
-	private static void procRow(Cell cell) {
-		if(cell.getCellType() == HSSFCell.CELL_TYPE_STRING){
-		    String cellValue = cell.getStringCellValue();
-		    //System.out.print("cellValue : " + cellValue);
-		    System.out.print(cellValue + " ");
-		}
-		
-//		if(cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC){
-//			Date birthdate = cell.getDateCellValue();
-//			System.out.print("birthdate :" + birthdate);
-//		}
-	}
-*/	
-	
 	
 	private static void calcCellType(Cell cell, ColumnAttr columnAttr) throws Exception {
 		//System.out.println("DEBUG:" + indexMap.get(columnAttr.getIndex()));
@@ -397,49 +451,6 @@ public class ProcDocs {
 			default:
          // some code
 		}
-		
-/*		
-		//System.out.print("[" + objDefaultFormat.formatCellValue(cell) + "]");
-		String cellValueStr = objDefaultFormat.formatCellValue(cell,objFormulaEvaluator);
-		System.out.print("[[" + cellValueStr + "]]");
-		
-		//analysis
-		Exception exp = new Exception("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		int curColInd = cell.getColumnIndex();
-		if(curColInd == titleMap.get("Num").intValue()){
-			if(cell.getCellType() == Cell.CELL_TYPE_STRING){
-				System.out.println("!!!!!!!!!!!!!!!!!!!!!! Num");
-				//throw exp;
-			}
-		}
-		if(curColInd == titleMap.get("ID").intValue()){
-			if(cell.getCellType() == Cell.CELL_TYPE_STRING){
-				System.out.println("!!!!!!!!!!!!!!!!!!!!!! ID");
-				//throw exp;
-			}
-		}
-		if(curColInd == titleMap.get("PPT").intValue()){
-			if(cell.getCellType() == Cell.CELL_TYPE_STRING){
-				System.out.println("!!!!!!!!!!!!!!!!!!!!!! PPT");
-				//throw exp;
-			}
-		}
-		if(curColInd == titleMap.get("IMT").intValue()){
-			if(cell.getCellType() == Cell.CELL_TYPE_STRING){
-				System.out.println("!!!!!!!!!!!!!!!!!!!!!! IMT");
-				//throw exp;
-			}
-		}
-*/
-		
-//		if(curColInd == titleMap.get("KDI").intValue()){
-//			if(cell.getCellType() == Cell.CELL_TYPE_STRING || cell.getCellType() == Cell.CELL_TYPE_BLANK){
-//				System.out.println("!!!!!!!!!!!!!!!!!!!!!! KDI");
-//				throw exp;
-//			}
-//		}
-		
-
 	}
 
 	private static void incAttrType(ColumnAttr columnAttr, ColumnType columnType) {
@@ -462,29 +473,18 @@ public class ProcDocs {
 	    return CellReference.convertNumToColString(curColumnIndex) + (rowIndex + 1);
 	}
 
-	
-	private static double avg(XSSFSheet mySheet, XSSFWorkbook myWorkBook, int curColumnIndex, XSSFRow rowResult){
-		//XSSFRow rowResult = mySheet.createRow(lastRowNum + SHIFT_FORMULA_ROW);
-		//Cell cell = rowResult.createCell(1);
+
+	private static double averageByColumn(XSSFSheet mySheet, XSSFWorkbook myWorkBook, int curColumnIndex, int lastRowNum, XSSFRow rowResult, XSSFFormulaEvaluator evaluator){
 		Cell cell = rowResult.createCell(curColumnIndex);
-		//System.out.println("getCellName(beginRange)=" + getCellName(beginRange));
-		//System.out.println("getCellName(endRange)=" + getCellName(endRange));
-		String range = getCellName(curColumnIndex,FIRST_ROW) + ":" + getCellName(curColumnIndex,lastRowNum);	//C2:C10
+		String range = getCellName(curColumnIndex,FIRST_ROW) + ":" + getCellName(curColumnIndex, lastRowNum);	//C2:C10
 		System.out.println("Range=" + range);
 		
 		cell.setCellType(XSSFCell.CELL_TYPE_FORMULA);
 		cell.setCellFormula("AVERAGE(" + range + ")");	    
-		//cell = row.createCell(3);
-		//cell.setCellValue("SUM(O2:O10)");
-		XSSFFormulaEvaluator evaluator = myWorkBook.getCreationHelper().createFormulaEvaluator();
-		XSSFFormulaEvaluator.evaluateAllFormulaCells(myWorkBook);
 		CellValue cellValue = evaluator.evaluate(cell);
 		System.out.println("FUNC prepared = " + cellValue.formatAsString());
 		//String result = cellValue.formatAsString(); //cellValue.getNumberValue()
-		double result = cellValue.getNumberValue();
-		//mySheet.removeRow(rowResult);
-		
-		return result;
+		return cellValue.getNumberValue();
 	}
 
 	
@@ -540,7 +540,110 @@ public class ProcDocs {
 	    }
 	}
 }
+
+
+/*
+//=Ã»Õ(H2:H200),=—◊®“(H2:H200)
+private static void calcMinMax(Row titleRow) throws Exception {
+	SortedSet<Integer> setRemoveMinMax = new TreeSet<Integer>();
+	XSSFRow rowResult = mySheet.createRow(lastRowNum + SHIFT_FORMULA_ROW);
+	for (Cell cell : titleRow){
+		int curColumnIndex = cell.getColumnIndex();
+		String columnName = indexMap.get(curColumnIndex);            	
+		if(columnName != null){	//skip columns with empty title
+			ColumnAttr columnAttr = attrMap.get(columnName);
+	    	if(columnAttr.isColNumCalculatable()){
+	    		Double count = funcNumber(mySheet, myWorkBook,curColumnIndex, rowResult, "—◊®“");
+	    		if(count > MIN_MAX_LOWER){
+		    		Double min = funcNumber(mySheet, myWorkBook,curColumnIndex, rowResult, "Ã»Õ");
+		    		Double max = funcNumber(mySheet, myWorkBook,curColumnIndex, rowResult, "Ã¿ —");
+		    		setRemoveMinMax.add(e)
+	    		}
+	    	}	
+	    }
+	}
+	NavigableSet<Integer> rmMinMax = ((TreeSet)setRemoveMinMax).descendingSet();
+	for (Integer rowInd : rmMinMax) {
+		System.out.println("DEBUG: 101 : will be removed rowInd =" + rowInd);
+		removeRow(mySheet, rowInd);
+	}
+}
+*/
+
+
+/*        
+SortedSet<Integer> setRemoveMinMax = new TreeSet<Integer>();
+if(REMOVE_MIN_MAX){
+	for (Cell cell : titleRow){
+		int curColumnIndex = cell.getColumnIndex();
+		String columnName = indexMap.get(curColumnIndex);            	
+		if(columnName != null){	//skip columns with empty title
+			ColumnAttr columnAttr = attrMap.get(columnName);
+	    	if(columnAttr.isColNumCalculatable()){
+	    		System.out.println("DEBUG: 100 :  columnName =" + columnName);
+	    		setRemoveMinMax.add(columnAttr.getMinValue().getRowNum());
+	    		setRemoveMinMax.add(columnAttr.getMaxValue().getRowNum());
+	    	}
+	    }
+	}
+	NavigableSet<Integer> rmMinMax = ((TreeSet)setRemoveMinMax).descendingSet();
+	for (Integer rowInd : rmMinMax) {
+		System.out.println("DEBUG: 101 : will be removed rowInd =" + rowInd);
+		removeRow(mySheet, rowInd);
+	}
+}
+*/        
+
+
+
+/*
+private static void procRow(Cell cell) {
+	if(cell.getCellType() == HSSFCell.CELL_TYPE_STRING){
+	    String cellValue = cell.getStringCellValue();
+	    //System.out.print("cellValue : " + cellValue);
+	    System.out.print(cellValue + " ");
+	}
 	
+//	if(cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC){
+//		Date birthdate = cell.getDateCellValue();
+//		System.out.print("birthdate :" + birthdate);
+//	}
+}
+*/	
+
+
+
+/*	
+private static double funcNumber(XSSFSheet mySheet, XSSFWorkbook myWorkBook, int curColumnIndex, XSSFRow rowResult, String formula){
+	//XSSFRow rowResult = mySheet.createRow(lastRowNum + SHIFT_FORMULA_ROW);
+	//Cell cell = rowResult.createCell(1);
+	Cell cell = rowResult.createCell(curColumnIndex);
+	//System.out.println("getCellName(beginRange)=" + getCellName(beginRange));
+	//System.out.println("getCellName(endRange)=" + getCellName(endRange));
+	String range = getCellName(curColumnIndex,FIRST_ROW) + ":" + getCellName(curColumnIndex,lastRowNum);	//C2:C10
+	System.out.println("Range=" + range);
+	
+	cell.setCellType(XSSFCell.CELL_TYPE_FORMULA);
+	String form = formula + "(" + range + ")";
+	cell.setCellFormula(form);	    
+	//cell = row.createCell(3);
+	//cell.setCellValue("SUM(O2:O10)");
+	XSSFFormulaEvaluator evaluator = myWorkBook.getCreationHelper().createFormulaEvaluator();
+	XSSFFormulaEvaluator.evaluateAllFormulaCells(myWorkBook);
+	CellValue cellValue = evaluator.evaluate(cell);
+	System.out.println("FUNC prepared = " + cellValue.formatAsString());
+	//String result = cellValue.formatAsString(); //cellValue.getNumberValue()
+	double result = cellValue.getNumberValue();
+	//mySheet.removeRow(rowResult);
+	
+	return result;
+}
+*/	
+
+
+
+
+
 //TODO
 //fix processing columns without title
 //calc average

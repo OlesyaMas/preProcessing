@@ -9,12 +9,17 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import lesya.maslyuk.gmail.com.utils.MyUtils;
 
 public class ColumnAttr {
+	public static final int MINMAX_REMOVING_ROWS = 5;
 	private static final double ORDINAL_FACTOR = 0.99;
 	private int index;
 	private ColumnType columnType = null;
 	private Map<ColumnType,Integer> typeMap = new HashMap<ColumnType,Integer>();
 	private double average;
-	private CellStyle cellStyle; 
+	private CellStyle cellStyle;
+	private MaxValue maxValue;
+	private MinValue minValue;
+	//int rowNum;
+	
 	
 	public ColumnAttr(int index) {
 		super();
@@ -45,6 +50,24 @@ public class ColumnAttr {
 
 	public void setAverage(double average) {
 		this.average = average;
+	}
+
+
+	public MaxValue getMaxValue() {
+		return maxValue;
+	}
+
+	public void setMaxValue(MaxValue maxValue) {
+		this.maxValue = maxValue;
+	}
+
+
+	public MinValue getMinValue() {
+		return minValue;
+	}
+
+	public void setMinValue(MinValue minValue) {
+		this.minValue = minValue;
 	}
 
 
@@ -82,6 +105,10 @@ public class ColumnAttr {
 	private boolean particularlyFilled(Set<ColumnType> columnTypeSet, ColumnType next) {
 		return next == ColumnType.BLANK && columnTypeSet.size()>1;
 	}
+
+	public boolean isMinMaxRemovingApplicable() {
+		return isColNumCalculatable() && typeMap.get(getColumnType()) >= MINMAX_REMOVING_ROWS;
+	}
 	
 	//TODO use counts
 	public boolean isColumnOrdinal(){
@@ -98,15 +125,18 @@ public class ColumnAttr {
 		return isOrdinal;
 	} 
 	
-//	public void setColumnType(ColumnType columnType) {
-//		this.columnType = columnType;
-//	}
 	
 	public Map<ColumnType, Integer> getTypeMap() {
 		return typeMap;
 	}
 	public void setTypeMap(Map<ColumnType, Integer> typeMap) {
 		this.typeMap = typeMap;
+	}
+
+	
+	public boolean isColNumCalculatable() {
+		//return columnAttr.getColumnType() == ColumnType.DECIMAL || (columnAttr.getColumnType() == ColumnType.INTEGER && !columnAttr.isColumnOrdinal());
+		return getColumnType() == ColumnType.DECIMAL || (getColumnType() == ColumnType.INTEGER && !isColumnOrdinal());
 	}
 	
 		
