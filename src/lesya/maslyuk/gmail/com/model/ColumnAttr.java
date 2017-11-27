@@ -1,14 +1,17 @@
 package lesya.maslyuk.gmail.com.model;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.poi.ss.usermodel.CellStyle;
 import lesya.maslyuk.gmail.com.utils.MyUtils;
 
 public class ColumnAttr {
+	public static final int FACTOR_CODING = 12;
 	public static final int MINMAX_REMOVING_ROWS = 5;
 	private static final double ORDINAL_FACTOR = 0.99;
 	private int index;
@@ -19,11 +22,13 @@ public class ColumnAttr {
 	private MaxValue maxValue;
 	private MinValue minValue;
 	//int rowNum;
+	//private Map<String, Integer> codingMap = new TreeMap<String,Integer>();
 	
+	private CodingMap codingMap = new CodingMap();
 	
 	public ColumnAttr(int index) {
 		super();
-		this.index = index;
+		//this.index = index;
 	}
 
 	
@@ -36,12 +41,12 @@ public class ColumnAttr {
 	}
 
 
-	public int getIndex() {
-		return index;
-	}
-	public void setIndex(int index) {
-		this.index = index;
-	}
+//	public int getIndex() {
+//		return index;
+//	}
+//	public void setIndex(int index) {
+//		this.index = index;
+//	}
 
 	
 	public double getAverage() {
@@ -125,6 +130,20 @@ public class ColumnAttr {
 		return isOrdinal;
 	} 
 	
+	//TODO add FACTOR
+	public boolean isColumnCodeable(){
+		boolean isCodeable = false;
+		if(getColumnType() == ColumnType.TEXT){
+			if(codingMap.size() > 1 && codingMap.size() <= FACTOR_CODING){
+				//this.typeMap.get(ColumnType.TEXT) 0,3% 
+				isCodeable = true;
+			}
+		}
+		return isCodeable;
+	}
+	
+	
+	
 	
 	public Map<ColumnType, Integer> getTypeMap() {
 		return typeMap;
@@ -134,6 +153,16 @@ public class ColumnAttr {
 	}
 
 	
+	public CodingMap getCodingMap() {
+		return codingMap;
+	}
+
+
+	public void setCodingMap(CodingMap codingMap) {
+		this.codingMap = codingMap;
+	}
+
+
 	public boolean isColNumCalculatable() {
 		//return columnAttr.getColumnType() == ColumnType.DECIMAL || (columnAttr.getColumnType() == ColumnType.INTEGER && !columnAttr.isColumnOrdinal());
 		return getColumnType() == ColumnType.DECIMAL || (getColumnType() == ColumnType.INTEGER && !isColumnOrdinal());

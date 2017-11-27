@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.Format;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,14 +24,21 @@ import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.formula.FormulaParseException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.CellValue;
+import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Hyperlink;
+import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -39,6 +47,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import lesya.maslyuk.gmail.com.TestClass.ShiftCells;
 import lesya.maslyuk.gmail.com.model.ColumnAttr;
 import lesya.maslyuk.gmail.com.model.ColumnType;
 import lesya.maslyuk.gmail.com.model.MaxValue;
@@ -57,10 +66,12 @@ public class Processing {
 	public static boolean DELETE_EMPTY = false;
 	public static boolean CALC_AVERAGE = false;
 	public static boolean REMOVE_MIN_MAX = false;
+	public static boolean CODING = false;
 	
-	///private static Map<Integer,Row> rowMap = new HashMap<Integer,Row>();
 	private static DataFormatter objDefaultFormat = new DataFormatter();
 	private static FormulaEvaluator objFormulaEvaluator;
+	
+	//TODO + 1 for maps: titleMap,indexMap,   attrMap?
 	private static Map<String,Integer> titleMap = new HashMap<String,Integer>();
 	private static Map<Integer,String> indexMap = new HashMap<Integer,String>();
 	private static Map<String,ColumnAttr> attrMap = new LinkedHashMap<String,ColumnAttr>();
@@ -68,11 +79,9 @@ public class Processing {
 	private static XSSFWorkbook myWorkBook; 
 	private static XSSFSheet mySheet;
 	
-
-	//String inputFile = "D:\\Dev\\neon_ws\\OlesyaPrj\\data\\InputDocs1.xls";
-	///static String inputFile = "D:\\study\\java_proj\\DataProc\\data\\Книга1_int-1.xlsx";
-	//static String inputFile = "D:\\study\\java_proj\\test\\Книга1_200.xlsx";
-	//static String outputFile = "D:\\study\\java_proj\\test\\Книга1_200_out.xlsx";
+	
+	///static String inputFile = "D:\\study\\java_proj\\multi\\Книга1_100_nocodes.xlsx";
+	///static String outputFile = "D:\\study\\java_proj\\multi\\Книга1_out_nocodes_test.xlsx";
 	static SortedSet<Integer> rowsToRemove = new TreeSet<Integer>();
 	
 	static String inputFile;
@@ -94,12 +103,12 @@ public class Processing {
 			
 			//removeRow(mySheet, mySheet.getLastRowNum());
 			//removeRow(mySheet, mySheet.getLastRowNum() - 10);
-			//for (Row row : mySheet) {
-			//	for (Cell cell : row){
-			//		cell.setCellStyle(stayleOrigin);
-			//	}
-			//}
-			
+/*			for (Row row : mySheet) {
+				for (Cell cell : row){
+					//cell.setCellStyle(stayleOrigin);
+				}
+			}
+*/			
 			readFromExcel(inputFile, outputFile);
 			//System.out.println("rowMap.size()=" + rowMap.size());
 			
@@ -113,6 +122,7 @@ public class Processing {
 		}
 	}
 
+	
 	
 	public static void readFromExcel(String inputFile, String outputFile) throws Exception{
 		Processing.inputFile = inputFile;
@@ -141,7 +151,7 @@ public class Processing {
 		defineTitleMap(titleRow);
 	    System.out.println(" ");
 	    
-//D        
+//        
 //	    Set<String> columnsName = titleMap.keySet();
 //	    Iterator it = columnsName.iterator();
 //	    while(it.hasNext()){
@@ -274,10 +284,89 @@ public class Processing {
         	removeEmptyRows();
         }
         
+        if(CODING){
+        	CodingProcessor codingProcessor = new CodingProcessor();
+        	codingProcessor.process(mySheet, indexMap, attrMap);
+        	
+			//loop for title columns
+        	Set<String> titles = titleMap.keySet();
+        	for (String columnTitle : titles) {
+        		int curColumnIndex = getTitleColumnIndex(columnTitle);
+				ColumnAttr columnAttr = attrMap.get(columnTitle);
+				System.out.println("DEBUG CODING columnName = " + columnTitle);
+				
+		    	if(!columnAttr.isColumnCodeable()){
+		    		continue;
+		    	}
+				
+				int nrRows = mySheet.getLastRowNum()+1;
+				int nrCols = mySheet.getRow(0).getLastCellNum();
+				
+				//shift all rows for defined Coding Columns
+				for (int row = 0; row < nrRows; row++) {
+					Row r = mySheet.getRow(row);
+
+					if (r == null) {
+						continue;
+					}
+					
+					//shift right cells
+					TestClass testClass = new TestClass();
+					int rightColIndex = curColumnIndex + 1;
+					//TestClass.shifColumn(nrCols, rightColIndex, r);
+					testClass.shifColumn(nrCols, rightColIndex, r);
+										
+					//create new column
+					Cell curr = r.getCell(curColumnIndex);					
+					int codeValue = -1;
+					if (r.getRowNum() == TITLE_ROW_NUM) {
+						objFormulaEvaluator.evaluate(curr); // This will evaluate the cell, And any type of cell will return string value
+					    String cellValueStr = objDefaultFormat.formatCellValue(curr,objFormulaEvaluator) + COLUMN_CODE;
+						int cellType = curr.getCellType();
+						r.createCell(rightColIndex, cellType);
+						r.getCell(rightColIndex).setCellValue(cellValueStr);
+						r.getCell(rightColIndex).setCellStyle(curr.getCellStyle());
+					}else{
+						codeValue = columnAttr.getCodingMap().getCode(curr.getStringCellValue());
+						if (codeValue >= 0){
+							int cellType = Cell.CELL_TYPE_NUMERIC;
+							r.createCell(rightColIndex, cellType);
+							r.getCell(rightColIndex).setCellValue(codeValue);
+						}else{
+							int cellType = Cell.CELL_TYPE_BLANK;
+							r.createCell(rightColIndex, cellType);
+						}
+					}
+					
+				}
+				
+			}
+        }
+        
+        
+        
         saveNew();
         	
     	myWorkBook.close();
     }
+
+
+
+	private static Integer getTitleColumnIndex(String title) {
+		Row dynTitleRow = mySheet.getRow(TITLE_ROW_NUM);
+		Integer titleColumnIndex = null;
+		for (Cell cell : dynTitleRow) {
+			objFormulaEvaluator.evaluate(cell); // This will evaluate the cell, And any type of cell will return string value
+		    String cellValueStr = objDefaultFormat.formatCellValue(cell,objFormulaEvaluator);
+		    if(cellValueStr.equals(title)){
+		    	titleColumnIndex = cell.getColumnIndex();
+		    	break;
+		    }else{
+		    	continue;
+		    }
+		}
+		return titleColumnIndex;
+	}
 
 
 	private static void removeEmptyRows() {

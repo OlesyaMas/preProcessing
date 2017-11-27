@@ -43,7 +43,7 @@ public class ProcI {
 	private JFrame frame;
 	private JTextField textField;
 	JFileChooser fileChooser = new JFileChooser();
-	static String inputFileFullName = "D:\\study\\java_proj\\test\\Книга1_1000.xlsx";
+	static String inputFileFullName = "D:\\study\\java_proj\\test\\Книга1_200_code.xlsx";
 	static String outputFile = "D:\\study\\java_proj\\test\\Книга1_out_test.xlsx";
 	
 	///static String inputFileFullName = "D:\\study\\java_proj\\data\\xls\\Книга1_200.xls";
@@ -101,10 +101,11 @@ public class ProcI {
 		btnNewButton.setBounds(74, 355, 499, 33);
 		frame.getContentPane().add(btnNewButton);
 		
-		JCheckBox chckbxNewCheckBox = new JCheckBox("\u041A\u043E\u0434\u0443\u0432\u0430\u043D\u043D\u044F \u044F\u043A\u0456\u0441\u043D\u0438\u0445 \u0437\u043D\u0430\u0447\u0435\u043D\u044C");
-		chckbxNewCheckBox.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		chckbxNewCheckBox.setBounds(489, 314, 213, 23);
-		frame.getContentPane().add(chckbxNewCheckBox);
+		JCheckBox cbCoding = new JCheckBox("\u041A\u043E\u0434\u0443\u0432\u0430\u043D\u043D\u044F \u044F\u043A\u0456\u0441\u043D\u0438\u0445 \u0437\u043D\u0430\u0447\u0435\u043D\u044C");
+		cbCoding.setFont(new Font("Tahoma", Font.BOLD, 11));
+		cbCoding.addActionListener(new CodingHandler());
+		cbCoding.setBounds(74, 316, 213, 23);
+		frame.getContentPane().add(cbCoding);
 		
 		JCheckBox checkBox = new JCheckBox("\u0410\u043D\u0430\u043B\u0456\u0437 \u0434\u0443\u0431\u043B\u044E\u044E\u0447\u0438\u0445 \u0440\u044F\u0434\u043A\u0456\u0432");
 		checkBox.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
@@ -114,7 +115,7 @@ public class ProcI {
 		JCheckBox cbRemoveMinMax = new JCheckBox("\u0412\u0438\u0434\u0430\u043B\u0435\u043D\u043D\u044F \u0430\u0443\u0442\u043B\u0430\u0439\u043D\u0456\u0432 (Min/Max)");
 		cbRemoveMinMax.addActionListener(new RemoveMinMaxHandler());
 		cbRemoveMinMax.setFont(new Font("Tahoma", Font.BOLD, 11));
-		cbRemoveMinMax.setBounds(74, 270, 260, 23);
+		cbRemoveMinMax.setBounds(74, 234, 260, 23);
 		frame.getContentPane().add(cbRemoveMinMax);
 		
 		JCheckBox checkBox_3 = new JCheckBox("\u0410\u043D\u0430\u043B\u0456\u0437 \u043D\u0435\u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u043D\u043E\u0441\u0442\u0435\u0439 \u0444\u043E\u0440\u043C\u0430\u0442\u0443");
@@ -139,7 +140,7 @@ public class ProcI {
 		label_2.setMaximumSize(new Dimension(124, 14));
 		label_2.setFont(new Font("Candara", Font.BOLD, 16));
 		label_2.setBackground(Color.ORANGE);
-		label_2.setBounds(74, 194, 167, 14);
+		label_2.setBounds(74, 158, 167, 14);
 		frame.getContentPane().add(label_2);
 		
 		JButton button_1 = new JButton("\u0417\u0430\u0432\u0430\u043D\u0442\u0430\u0436\u0438\u0442\u0438 \u0444\u0430\u0439\u043B");
@@ -162,13 +163,13 @@ public class ProcI {
 		cbAverage.setFont(new Font("Tahoma", Font.BOLD, 11));
 		cbAverage.addActionListener(new CalcAverageHandler());
 		//cbAverage.setAction(action);
-		cbAverage.setBounds(74, 224, 282, 23);
+		cbAverage.setBounds(74, 188, 282, 23);
 		frame.getContentPane().add(cbAverage);
 		
 		JCheckBox cbRemoveEmptyCells = new JCheckBox("\u0412\u0438\u0434\u0430\u043B\u0435\u043D\u043D\u044F \u0440\u044F\u0434\u043A\u0456\u0432 \u0437 \u043F\u0443\u0441\u0442\u0438\u043C\u0438 \u044F\u0447\u0435\u0439\u043A\u0430\u043C\u0438");
 		cbRemoveEmptyCells.setFont(new Font("Tahoma", Font.BOLD, 11));
 		cbRemoveEmptyCells.addActionListener(new RemoveEmptyHandler());
-		cbRemoveEmptyCells.setBounds(74, 310, 282, 23);
+		cbRemoveEmptyCells.setBounds(74, 274, 282, 23);
 		frame.getContentPane().add(cbRemoveEmptyCells);
 	}
 	
@@ -204,6 +205,17 @@ public class ProcI {
 				Processing.REMOVE_MIN_MAX = true;
 			}else{
 				Processing.REMOVE_MIN_MAX = false;
+			}
+		}
+	}
+	
+	private final class CodingHandler implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			JCheckBox cbCoding = (JCheckBox)e.getSource();
+			if(cbCoding.isSelected()){
+				Processing.CODING = true;
+			}else{
+				Processing.CODING = false;
 			}
 		}
 	}
