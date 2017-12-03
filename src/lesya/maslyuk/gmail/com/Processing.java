@@ -1,4 +1,5 @@
 package lesya.maslyuk.gmail.com;
+import java.awt.TrayIcon.MessageType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,6 +20,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -369,6 +371,9 @@ public class Processing {
         saveNew();
         	
     	myWorkBook.close();
+    	
+    	String message = "Документ опрацьовано !";
+    	JOptionPane.showMessageDialog(null, message);
     }
 
 

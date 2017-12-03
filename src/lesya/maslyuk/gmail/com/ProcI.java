@@ -43,8 +43,9 @@ public class ProcI {
 	private JFrame frame;
 	private JTextField textField;
 	JFileChooser fileChooser = new JFileChooser();
-	static String inputFileFullName = "D:\\study\\java_proj\\test\\Книга1_500_code.xlsx";
-	static String outputFile = "D:\\study\\java_proj\\test1\\Книга1_out_test.xlsx";
+	static String inputFileFullName = null; //"D:\\study\\java_proj\\test\\Книга1_500_code.xlsx";
+	static String outputFile = null; //"D:\\study\\java_proj\\test1\\Книга1_out_test.xlsx";
+	private JLabel lbResultFile;
 	
 	///static String inputFileFullName = "D:\\study\\java_proj\\data\\xls\\Книга1_200.xls";
 	///static String outputFile = "D:\\study\\java_proj\\data\\xls\\Книга1_200_out.xls";
@@ -82,6 +83,7 @@ public class ProcI {
 		frame.setBounds(100, 100, 857, 502);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
+		frame.setTitle("Попередня обробка Excel документів");
 		
 		/*textField = new JTextField();
 		textField.setBounds(256, 62, 338, 20);
@@ -143,8 +145,8 @@ public class ProcI {
 		label_2.setBounds(74, 158, 167, 14);
 		frame.getContentPane().add(label_2);
 		
-		JLabel lbSelectedFile = new JLabel("\u043D\u0435 \u0432\u0438\u0431\u0440\u0430\u043D\u043E");
-		lbSelectedFile.setBounds(478, 84, 330, 14);
+		JLabel lbSelectedFile = new JLabel("\u041D\u0435 \u0432\u0438\u0431\u0440\u0430\u043D\u043E");
+		lbSelectedFile.setBounds(319, 84, 465, 14);
 		frame.getContentPane().add(lbSelectedFile);
 
 		JButton btnLoadFile = new JButton("\u0417\u0430\u0432\u0430\u043D\u0442\u0430\u0436\u0438\u0442\u0438 \u0444\u0430\u0439\u043B");
@@ -200,9 +202,9 @@ public class ProcI {
 		lblNewLabel_2.setBounds(78, 411, 231, 14);
 		frame.getContentPane().add(lblNewLabel_2);
 		
-		JLabel lbresult = new JLabel("");
-		lbresult.setBounds(478, 411, 46, 14);
-		frame.getContentPane().add(lbresult);
+		lbResultFile = new JLabel("\u041D\u0435 \u0432\u0438\u0431\u0440\u0430\u043D\u043E");
+		lbResultFile.setBounds(328, 411, 425, 14);
+		frame.getContentPane().add(lbResultFile);
 		
 		JProgressBar pbMinMax = new JProgressBar();
 		pbMinMax.setBounds(478, 234, 275, 14);
@@ -278,18 +280,30 @@ public class ProcI {
 
 
 		public void actionPerformed(ActionEvent e) {
-			
 			System.out.println("Load is pressed");
 			int returnVal = fileChooser.showOpenDialog(frame);
-			/*Docs importDocs = new Docs();
-			importDocs.*/
 		    //int returnVal = chooser.showOpenDialog(chooser);
+			
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File inputFile = fileChooser.getSelectedFile();
-				//TODO move to Docs read file + show message in label
 				inputFileFullName = inputFile.getAbsolutePath().toString();
-				lbSelectedFile.setText(inputFileFullName); 
+				lbSelectedFile.setText(inputFileFullName);
+				
+				defineOutFile(inputFile);
+				lbResultFile.setText(outputFile);
+				
+				System.out.println("Output File is:" + outputFile);
 			}
+		}
+
+
+		private String defineOutFile(File inputFile) {
+			String fullPath = inputFile.getParentFile().toString();
+			String fileName = inputFile.getName();
+			String outFileName = fileName.substring(0, fileName.indexOf(".")) + "_out." + 
+					fileName.substring(fileName.indexOf(".") + 1, fileName.length());
+			outputFile = fullPath + File.separator + outFileName;
+			return outputFile; 
 		}
 	}
 
@@ -297,7 +311,10 @@ public class ProcI {
 	private final class ProcessFileHandler implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			try {
-				//Docs.readFile(inputFile);
+				if(inputFileFullName == null){
+					JOptionPane.showMessageDialog(frame, "Виберіть документ !");
+					return;
+				}
 				Processing.readFromExcel(inputFileFullName, outputFile);								
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
