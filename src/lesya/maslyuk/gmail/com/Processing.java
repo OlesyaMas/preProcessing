@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.swing.JProgressBar;
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -72,8 +74,8 @@ public class Processing {
 	private static FormulaEvaluator objFormulaEvaluator;
 	
 	//TODO + 1 for maps: titleMap,indexMap,   attrMap?
-	private static Map<String,Integer> titleMap = new HashMap<String,Integer>();
-	private static Map<Integer,String> indexMap = new HashMap<Integer,String>();
+	private static Map<String,Integer> titleMap = new LinkedHashMap<String,Integer>();
+	private static Map<Integer,String> indexMap = new LinkedHashMap<Integer,String>();
 	private static Map<String,ColumnAttr> attrMap = new LinkedHashMap<String,ColumnAttr>();
 
 	private static XSSFWorkbook myWorkBook; 
@@ -87,6 +89,11 @@ public class Processing {
 	static String inputFile;
 	static String outputFile;
 	
+	private static JProgressBar pbAverage;
+	private static JProgressBar pbCoding;
+	private static JProgressBar pbMinMax;
+	private static JProgressBar pbDeleteEmpty;
+
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -189,9 +196,16 @@ public class Processing {
         
         if(REMOVE_MIN_MAX){
         	System.out.println("DEBUG 110 processing min/max");
+        	
+    		pbMinMax.setMinimum(0);
+    		pbMinMax.setMaximum(mySheet.getLastRowNum());
+    		
 	        for (Row row : mySheet) {
-	        	int zeroLine = row.getRowNum();
-	        	if (zeroLine == 0)
+	        	int rowNum = row.getRowNum();
+	        	pbMinMax.setValue(rowNum);
+	        	pbMinMax.update(pbMinMax.getGraphics());
+
+	        	if (rowNum == 0)
 	        		continue;
 	        	
 	        	for (Cell cell : row) {                	
@@ -220,7 +234,7 @@ public class Processing {
 			    	}
 			    }
 			}
-	        removeEmptyRows();
+	        removeEmptyRows(null);
         }
 
 			    	
@@ -232,9 +246,10 @@ public class Processing {
 
         int lastColumn = titleRow.getLastCellNum();
         System.out.println("DEBUG:0: row.getLastCellNum()=" + lastColumn);
-        
+		
         for (Row row : mySheet) {
         	int curRowIndex = row.getRowNum();
+        	
         	if (curRowIndex == 0) continue;
         	System.out.println("DEBUG:000000000000000000000000000000000000000000000): row.getRowNum()=" + row.getRowNum());
         	
@@ -281,7 +296,7 @@ public class Processing {
         }
 
         if(DELETE_EMPTY){
-        	removeEmptyRows();
+        	removeEmptyRows(pbDeleteEmpty);
         }
         
         if(CODING){
@@ -290,15 +305,21 @@ public class Processing {
         	
 			//loop for title columns
         	Set<String> titles = titleMap.keySet();
+			pbCoding.setMinimum(0);
+			pbCoding.setMaximum(titles.size());
+
         	for (String columnTitle : titles) {
         		int curColumnIndex = getTitleColumnIndex(columnTitle);
 				ColumnAttr columnAttr = attrMap.get(columnTitle);
 				System.out.println("DEBUG CODING columnName = " + columnTitle);
 				
+				pbCoding.setValue(curColumnIndex);
+				pbCoding.update(pbCoding.getGraphics());
+		        	
 		    	if(!columnAttr.isColumnCodeable()){
 		    		continue;
 		    	}
-				
+						    			    	
 				int nrRows = mySheet.getLastRowNum()+1;
 				int nrCols = mySheet.getRow(0).getLastCellNum();
 				
@@ -368,12 +389,22 @@ public class Processing {
 		return titleColumnIndex;
 	}
 
-
-	private static void removeEmptyRows() {
+	
+	private static void removeEmptyRows(JProgressBar progressBar) {
 		NavigableSet<Integer> rowsToRemove_nav = ((TreeSet)rowsToRemove).descendingSet();	//because shifting from last rows
+
+		if(progressBar != null){
+			progressBar.setMinimum(0);
+			progressBar.setMaximum(rowsToRemove_nav.size());
+		}
 		for (Integer rowInd : rowsToRemove_nav) {
-			System.out.println("DEBUG: 101 : will be removed rowInd =" + rowInd);
 			removeRow(mySheet, rowInd);
+			
+			System.out.println("DEBUG: 101 : Row removed rowInd =" + rowInd);
+			if(progressBar != null){
+				progressBar.setValue(rowsToRemove_nav.size() - rowInd);
+				progressBar.update(progressBar.getGraphics());
+			}
 		}
 		
 		for (Row row : mySheet) {
@@ -403,8 +434,15 @@ public class Processing {
 		XSSFFormulaEvaluator evaluator = myWorkBook.getCreationHelper().createFormulaEvaluator();
 		evaluator.clearAllCachedResultValues();
 		
+		pbAverage.setMinimum(0);
+		pbAverage.setMaximum(titleRow.getLastCellNum());
+		
 		for (Cell cell : titleRow){
 			int curColumnIndex = cell.getColumnIndex();
+
+			pbAverage.setValue(curColumnIndex);
+        	pbAverage.update(pbAverage.getGraphics());
+			
 			String columnName = indexMap.get(curColumnIndex);            	
 			if(columnName != null){	//skip columns with empty title
 				ColumnAttr columnAttr = attrMap.get(columnName);
@@ -628,6 +666,24 @@ public class Processing {
 	        }
 	    }
 	}
+	
+	
+	public static void setPbAverage(JProgressBar pbAverage) {
+		Processing.pbAverage = pbAverage;
+	}
+
+	public static void setPbCoding(JProgressBar pbCoding) {
+		Processing.pbCoding = pbCoding;
+	}
+
+	public static void setPbMinMax(JProgressBar pbMinMax) {
+		Processing.pbMinMax = pbMinMax;
+	}
+
+	public static void setPbDeleteEmpty(JProgressBar pbDeleteEmpty) {
+		Processing.pbDeleteEmpty = pbDeleteEmpty;
+	}
+
 }
 
 

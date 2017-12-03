@@ -43,8 +43,8 @@ public class ProcI {
 	private JFrame frame;
 	private JTextField textField;
 	JFileChooser fileChooser = new JFileChooser();
-	static String inputFileFullName = "D:\\study\\java_proj\\test\\Книга1_200_code.xlsx";
-	static String outputFile = "D:\\study\\java_proj\\test\\Книга1_out_test.xlsx";
+	static String inputFileFullName = "D:\\study\\java_proj\\test\\Книга1_500_code.xlsx";
+	static String outputFile = "D:\\study\\java_proj\\test1\\Книга1_out_test.xlsx";
 	
 	///static String inputFileFullName = "D:\\study\\java_proj\\data\\xls\\Книга1_200.xls";
 	///static String outputFile = "D:\\study\\java_proj\\data\\xls\\Книга1_200_out.xls";
@@ -79,7 +79,7 @@ public class ProcI {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 857, 452);
+		frame.setBounds(100, 100, 857, 502);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -92,13 +92,13 @@ public class ProcI {
 		 frame.getContentPane().add(fileChooser);
 		 fileChooser.setVisible(true);
 		
-		JButton btnNewButton = new JButton("\u0410\u043D\u0430\u043B\u0456\u0437\u0443\u0432\u0430\u0442\u0438");
+		JButton btnNewButton = new JButton("\u041E\u0431\u0440\u043E\u0431\u0438\u0442\u0438 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442");
 		btnNewButton.addActionListener(new ProcessFileHandler());
 		
 		btnNewButton.setForeground(new Color(128, 0, 0));
 		btnNewButton.setBackground(UIManager.getColor("ToolTip.background"));
 		btnNewButton.setFont(new Font("Sitka Text", Font.BOLD, 14));
-		btnNewButton.setBounds(74, 355, 499, 33);
+		btnNewButton.setBounds(74, 355, 679, 33);
 		frame.getContentPane().add(btnNewButton);
 		
 		JCheckBox cbCoding = new JCheckBox("\u041A\u043E\u0434\u0443\u0432\u0430\u043D\u043D\u044F \u044F\u043A\u0456\u0441\u043D\u0438\u0445 \u0437\u043D\u0430\u0447\u0435\u043D\u044C");
@@ -107,10 +107,10 @@ public class ProcI {
 		cbCoding.setBounds(74, 316, 213, 23);
 		frame.getContentPane().add(cbCoding);
 		
-		JCheckBox checkBox = new JCheckBox("\u0410\u043D\u0430\u043B\u0456\u0437 \u0434\u0443\u0431\u043B\u044E\u044E\u0447\u0438\u0445 \u0440\u044F\u0434\u043A\u0456\u0432");
-		checkBox.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		checkBox.setBounds(489, 275, 195, 23);
-		frame.getContentPane().add(checkBox);
+//		JCheckBox checkBox = new JCheckBox("\u0410\u043D\u0430\u043B\u0456\u0437 \u0434\u0443\u0431\u043B\u044E\u044E\u0447\u0438\u0445 \u0440\u044F\u0434\u043A\u0456\u0432");
+//		checkBox.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
+//		checkBox.setBounds(489, 275, 195, 23);
+//		frame.getContentPane().add(checkBox);
 		
 		JCheckBox cbRemoveMinMax = new JCheckBox("\u0412\u0438\u0434\u0430\u043B\u0435\u043D\u043D\u044F \u0430\u0443\u0442\u043B\u0430\u0439\u043D\u0456\u0432 (Min/Max)");
 		cbRemoveMinMax.addActionListener(new RemoveMinMaxHandler());
@@ -118,15 +118,15 @@ public class ProcI {
 		cbRemoveMinMax.setBounds(74, 234, 260, 23);
 		frame.getContentPane().add(cbRemoveMinMax);
 		
-		JCheckBox checkBox_3 = new JCheckBox("\u0410\u043D\u0430\u043B\u0456\u0437 \u043D\u0435\u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u043D\u043E\u0441\u0442\u0435\u0439 \u0444\u043E\u0440\u043C\u0430\u0442\u0443");
-		checkBox_3.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		checkBox_3.setBounds(489, 228, 235, 23);
-		frame.getContentPane().add(checkBox_3);
+//		JCheckBox checkBox_3 = new JCheckBox("\u0410\u043D\u0430\u043B\u0456\u0437 \u043D\u0435\u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u043D\u043E\u0441\u0442\u0435\u0439 \u0444\u043E\u0440\u043C\u0430\u0442\u0443");
+//		checkBox_3.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
+//		checkBox_3.setBounds(489, 228, 235, 23);
+//		frame.getContentPane().add(checkBox_3);
 		
-		JCheckBox checkBox_4 = new JCheckBox("\u0410\u043D\u043E\u043D\u0456\u043C\u0456\u0437\u0430\u0446\u0456\u044F \u0434\u0430\u043D\u0438\u0445");
-		checkBox_4.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
-		checkBox_4.setBounds(489, 189, 195, 23);
-		frame.getContentPane().add(checkBox_4);
+//		JCheckBox checkBox_4 = new JCheckBox("\u0410\u043D\u043E\u043D\u0456\u043C\u0456\u0437\u0430\u0446\u0456\u044F \u0434\u0430\u043D\u0438\u0445");
+//		checkBox_4.setFont(new Font("Trebuchet MS", Font.PLAIN, 12));
+//		checkBox_4.setBounds(489, 189, 195, 23);
+//		frame.getContentPane().add(checkBox_4);
 		
 		JLabel label = new JLabel("\u0412\u043A\u0430\u0436\u0456\u0442\u044C \u0448\u043B\u044F\u0445 \u0434\u043E \u0444\u0430\u0439\u043B\u0443:");
 		label.setBackground(Color.ORANGE);
@@ -143,21 +143,18 @@ public class ProcI {
 		label_2.setBounds(74, 158, 167, 14);
 		frame.getContentPane().add(label_2);
 		
-		JButton button_1 = new JButton("\u0417\u0430\u0432\u0430\u043D\u0442\u0430\u0436\u0438\u0442\u0438 \u0444\u0430\u0439\u043B");
-		button_1.addActionListener(new LoadFileHandler());
+		JLabel lbSelectedFile = new JLabel("\u043D\u0435 \u0432\u0438\u0431\u0440\u0430\u043D\u043E");
+		lbSelectedFile.setBounds(478, 84, 330, 14);
+		frame.getContentPane().add(lbSelectedFile);
+
+		JButton btnLoadFile = new JButton("\u0417\u0430\u0432\u0430\u043D\u0442\u0430\u0436\u0438\u0442\u0438 \u0444\u0430\u0439\u043B");
+		btnLoadFile.addActionListener(new LoadFileHandler(lbSelectedFile));
 		
-		button_1.setForeground(new Color(128, 0, 0));
-		button_1.setFont(new Font("Sitka Text", Font.BOLD, 14));
-		button_1.setBackground(SystemColor.info);
-		button_1.setBounds(69, 107, 173, 33);
-		frame.getContentPane().add(button_1);
-		
-		JButton button_2 = new JButton("\u0417\u0431\u0435\u0440\u0435\u0433\u0442\u0438");
-		button_2.setForeground(new Color(128, 0, 0));
-		button_2.setFont(new Font("Sitka Text", Font.BOLD, 14));
-		button_2.setBackground(SystemColor.info);
-		button_2.setBounds(616, 355, 173, 33);
-		frame.getContentPane().add(button_2);
+		btnLoadFile.setForeground(new Color(128, 0, 0));
+		btnLoadFile.setFont(new Font("Sitka Text", Font.BOLD, 14));
+		btnLoadFile.setBackground(SystemColor.info);
+		btnLoadFile.setBounds(478, 29, 275, 33);
+		frame.getContentPane().add(btnLoadFile);
 		
 		JCheckBox cbAverage = new JCheckBox("\u0417\u0430\u043C\u0456\u043D\u0430 \u043F\u0440\u043E\u043F\u0443\u0449\u0435\u043D\u0438\u0445 \u0437\u043D\u0430\u0447\u0435\u043D\u044C \u043D\u0430 \u0441\u0435\u0440\u0435\u0434\u043D\u0454");
 		cbAverage.setFont(new Font("Tahoma", Font.BOLD, 11));
@@ -171,6 +168,56 @@ public class ProcI {
 		cbRemoveEmptyCells.addActionListener(new RemoveEmptyHandler());
 		cbRemoveEmptyCells.setBounds(74, 274, 282, 23);
 		frame.getContentPane().add(cbRemoveEmptyCells);
+		
+		JLabel lblNewLabel = new JLabel("\u0412\u0438\u0431\u0440\u0430\u043D\u043E \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442 \u0434\u043B\u044F \u043E\u0431\u0440\u043E\u0431\u043A\u0438:");
+		lblNewLabel.setFont(new Font("Candara", Font.BOLD, 16));
+		lblNewLabel.setBounds(69, 84, 240, 14);
+		frame.getContentPane().add(lblNewLabel);
+		
+		JLabel lblNewLabel_1 = new JLabel("\u0421\u0442\u0430\u0442\u0443\u0441:");
+		lblNewLabel_1.setFont(new Font("Candara", Font.BOLD, 16));
+		lblNewLabel_1.setBounds(478, 158, 95, 14);
+		frame.getContentPane().add(lblNewLabel_1);
+		
+		JProgressBar pbAverage = new JProgressBar();
+		pbAverage.setBounds(478, 188, 275, 14);
+		frame.getContentPane().add(pbAverage);		
+
+		pbAverage.setStringPainted(true);
+		pbAverage.setIndeterminate(false);
+		Processing.setPbAverage(pbAverage);
+		
+		JProgressBar pbCoding = new JProgressBar();
+		pbCoding.setBounds(475, 316, 278, 14);
+		frame.getContentPane().add(pbCoding);
+		
+		pbCoding.setStringPainted(true);
+		pbCoding.setIndeterminate(false);
+		Processing.setPbCoding(pbCoding);
+		
+		JLabel lblNewLabel_2 = new JLabel("\u041E\u0431\u0440\u043E\u0431\u043B\u0435\u043D\u0438\u0439 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442:");
+		lblNewLabel_2.setFont(new Font("Candara", Font.BOLD, 16));
+		lblNewLabel_2.setBounds(78, 411, 231, 14);
+		frame.getContentPane().add(lblNewLabel_2);
+		
+		JLabel lbresult = new JLabel("");
+		lbresult.setBounds(478, 411, 46, 14);
+		frame.getContentPane().add(lbresult);
+		
+		JProgressBar pbMinMax = new JProgressBar();
+		pbMinMax.setBounds(478, 234, 275, 14);
+		frame.getContentPane().add(pbMinMax);
+		pbMinMax.setStringPainted(true);
+		pbMinMax.setIndeterminate(false);
+		Processing.setPbMinMax(pbMinMax);
+
+		
+		JProgressBar pbDeleteEmpty = new JProgressBar();
+		pbDeleteEmpty.setBounds(478, 274, 275, 14);
+		frame.getContentPane().add(pbDeleteEmpty);
+		pbDeleteEmpty.setStringPainted(true);
+		pbDeleteEmpty.setIndeterminate(false);
+		Processing.setPbDeleteEmpty(pbDeleteEmpty);
 	}
 	
 	
@@ -222,6 +269,14 @@ public class ProcI {
 	
 
 	private final class LoadFileHandler implements ActionListener {
+		JLabel lbSelectedFile;
+		
+		public LoadFileHandler(JLabel lbSelectedFile) {
+			super();
+			this.lbSelectedFile = lbSelectedFile;
+		}
+
+
 		public void actionPerformed(ActionEvent e) {
 			
 			System.out.println("Load is pressed");
@@ -233,6 +288,7 @@ public class ProcI {
 				File inputFile = fileChooser.getSelectedFile();
 				//TODO move to Docs read file + show message in label
 				inputFileFullName = inputFile.getAbsolutePath().toString();
+				lbSelectedFile.setText(inputFileFullName); 
 			}
 		}
 	}
