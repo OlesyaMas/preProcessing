@@ -14,6 +14,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
@@ -227,10 +229,8 @@ public class ProcI {
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox cbAverage = (JCheckBox)e.getSource();
 			if(cbAverage.isSelected()){
-				//JOptionPane.showMessageDialog(frame, "JCheckBox is selected");
 				Processing.CALC_AVERAGE = true;
 			}else{
-				//JOptionPane.showMessageDialog(frame, "JCheckBox is NOT selected");
 				Processing.CALC_AVERAGE = false;
 			}
 		}
@@ -315,7 +315,17 @@ public class ProcI {
 					JOptionPane.showMessageDialog(frame, "Виберіть документ !");
 					return;
 				}
-				Processing.readFromExcel(inputFileFullName, outputFile);								
+				
+				Date begin = new Date();
+				Processing.readFromExcel(inputFileFullName, outputFile);
+				Date finish = new Date();
+				
+		    	//SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yy:HH:mm:SS");
+		    	SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:SS");
+		        String resultTime = DATE_FORMAT.format(finish.getTime() - begin.getTime());
+
+		        String message = "Документ опрацьовано за " + resultTime + "!";
+		    	JOptionPane.showMessageDialog(null, message);
 			} catch (FileNotFoundException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

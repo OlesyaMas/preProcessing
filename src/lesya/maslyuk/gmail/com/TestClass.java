@@ -6,8 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -100,7 +104,7 @@ public class TestClass {
 		public void run() {
 			// TODO Auto-generated method stub
 			//TestClass testClass = new TestClass();
-			testClass.shifColumn(nrCols, columnIndex, row);
+			///testClass.shifColumn(nrCols, columnIndex, row);
 		}
 	} 
 	
@@ -137,6 +141,8 @@ public class TestClass {
 	}
 
 */
+
+/**	
 	public void shifColumn(int nrCols, int columnIndex, Row r) {
 		// shift to right
 		for (int col = nrCols; col > columnIndex; col--) {
@@ -153,32 +159,65 @@ public class TestClass {
 			}
 		}
 	}	
+**/
+	
+	public void shifColumn1(int nrCols, int columnIndex, Row r) {
+
+		// shift to right
+		for (int col = nrCols; col > columnIndex; col--) {
+			Cell rightCell = r.getCell(col);
+			String cellValueStr; 
+			CellType rightCellType;
+
+			if (rightCell == null) {
+				rightCell = r.createCell(col);
+			}
+			
+//			//String value = rightCell.getStringCellValue();
+//				Processing.objFormulaEvaluator.evaluate(rightCell); // This will evaluate the cell, And any type of cell will return string value
+//			    cellValueStr = Processing.objDefaultFormat.formatCellValue(rightCell, Processing.objFormulaEvaluator) + Processing.COLUMN_CODE;
+//				rightCellType = rightCell.getCellTypeEnum();
+
+			Cell leftCell = r.getCell(col - 1);
+			//CellType leftCellType;
+			if (leftCell != null) {
+				rightCell.setCellType(leftCell.getCellType());
+				rightCell.setCellStyle(leftCell.getCellStyle());
+				//rightCell.getCellStyle().setFillBackgroundColor(HSSFColor.AQUA.index);
+				cloneCell(rightCell, leftCell);
+			}
+		}
+	}	
 	
 	public void cloneCell(Cell cNew, Cell cOld) {
 		cNew.setCellComment(cOld.getCellComment());
-		cNew.setCellStyle(cOld.getCellStyle());
+		//cNew.setCellStyle(cOld.getCellStyle());
 
 		switch (cOld.getCellType()) {
-		case Cell.CELL_TYPE_BOOLEAN: {
-			cNew.setCellValue(cOld.getBooleanCellValue());
-			break;
-		}
-		case Cell.CELL_TYPE_NUMERIC: {
-			cNew.setCellValue(cOld.getNumericCellValue());
-			break;
-		}
-		case Cell.CELL_TYPE_STRING: {
-			cNew.setCellValue(cOld.getStringCellValue());
-			break;
-		}
-		case Cell.CELL_TYPE_ERROR: {
-			cNew.setCellValue(cOld.getErrorCellValue());
-			break;
-		}
-		case Cell.CELL_TYPE_FORMULA: {
-			cNew.setCellFormula(cOld.getCellFormula());
-			break;
-		}
+			case Cell.CELL_TYPE_BOOLEAN: {
+				cNew.setCellValue(cOld.getBooleanCellValue());
+				break;
+			}
+			case Cell.CELL_TYPE_NUMERIC: {
+				cNew.setCellValue(cOld.getNumericCellValue());
+				break;
+			}
+			case Cell.CELL_TYPE_STRING: {
+				cNew.setCellValue(cOld.getStringCellValue());
+				break;
+			}
+			case Cell.CELL_TYPE_BLANK: {
+				cNew.setCellValue("");
+				break;
+			}
+			case Cell.CELL_TYPE_ERROR: {
+				cNew.setCellValue(cOld.getErrorCellValue());
+				break;
+			}
+			case Cell.CELL_TYPE_FORMULA: {
+				cNew.setCellFormula(cOld.getCellFormula());
+				break;
+			}
 		}
 	}	
 	

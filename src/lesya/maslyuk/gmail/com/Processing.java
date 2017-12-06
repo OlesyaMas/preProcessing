@@ -84,12 +84,12 @@ public class Processing {
 	private static XSSFSheet mySheet;
 	
 	
-	///static String inputFile = "D:\\study\\java_proj\\multi\\Книга1_100_nocodes.xlsx";
-	///static String outputFile = "D:\\study\\java_proj\\multi\\Книга1_out_nocodes_test.xlsx";
+	static String inputFile = "D:\\study\\java_proj\\test1\\Книга1_100_nocodes.xlsx";
+	static String outputFile = "D:\\study\\java_proj\\test1\\Книга1_100_nocodes_perform.xlsx";
 	static SortedSet<Integer> rowsToRemove = new TreeSet<Integer>();
 	
-	static String inputFile;
-	static String outputFile;
+	//static String inputFile;
+	//static String outputFile;
 	
 	private static JProgressBar pbAverage;
 	private static JProgressBar pbCoding;
@@ -307,13 +307,13 @@ public class Processing {
         	
 			//loop for title columns
         	Set<String> titles = titleMap.keySet();
-			pbCoding.setMinimum(0);
+        	pbCoding.setMinimum(0);
 			pbCoding.setMaximum(titles.size());
 
         	for (String columnTitle : titles) {
         		int curColumnIndex = getTitleColumnIndex(columnTitle);
 				ColumnAttr columnAttr = attrMap.get(columnTitle);
-				System.out.println("DEBUG CODING columnName = " + columnTitle);
+				System.out.println("DEBUG CODING columnName = " + columnTitle + " curColumnIndex=" + curColumnIndex);
 				
 				pbCoding.setValue(curColumnIndex);
 				pbCoding.update(pbCoding.getGraphics());
@@ -337,7 +337,7 @@ public class Processing {
 					TestClass testClass = new TestClass();
 					int rightColIndex = curColumnIndex + 1;
 					//TestClass.shifColumn(nrCols, rightColIndex, r);
-					testClass.shifColumn(nrCols, rightColIndex, r);
+					testClass.shifColumn1(nrCols, rightColIndex, r);
 										
 					//create new column
 					Cell curr = r.getCell(curColumnIndex);					
@@ -371,9 +371,6 @@ public class Processing {
         saveNew();
         	
     	myWorkBook.close();
-    	
-    	String message = "Документ опрацьовано !";
-    	JOptionPane.showMessageDialog(null, message);
     }
 
 
