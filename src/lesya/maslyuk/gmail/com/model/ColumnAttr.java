@@ -77,25 +77,14 @@ public class ColumnAttr {
 
 
 	public ColumnType getColumnType() {
-		//ColumnType result;
 		if(columnType == null){
 			columnType = ColumnType.BLANK;
 			Map<ColumnType, Integer> sortedTypeMap = MyUtils.sortByValues((HashMap<ColumnType, Integer>)typeMap);
-//			Set set2 = sortedTypeMap.entrySet();
-//			Iterator iterator1 = set2.iterator();
-//			while(iterator1.hasNext()){
-//		    	Map.Entry mTypes = (Map.Entry)iterator1.next();
-//		    	System.out.println("@@@@@@@@@@@" + mTypes.getKey() + "   " + mTypes.getValue());
-//			}		
 			
 			Set<ColumnType> columnTypeSet = sortedTypeMap.keySet();
 			Iterator iterator = columnTypeSet.iterator();
 			while(iterator.hasNext()) {
-		    	//Map.Entry<ColumnType, Integer> me = (Map.Entry)iterator.next();//java.lang.ClassCastException: ColumnType cannot be cast to java.util.Map$Entry
 		    	ColumnType next = (ColumnType)iterator.next();
-		    	//result = next.getKey();
-		    	//System.out.print(me.getKey() + ": ");
-		    	//System.out.println(me.getValue());
 		    	if(particularlyFilled(columnTypeSet, next))
 		    		next = (ColumnType)iterator.next();
 		    	
@@ -105,10 +94,32 @@ public class ColumnAttr {
 		}
 		return columnType; 
 	}
+	
+/*	
+	public Boolean hasWrongValue() {
+		Boolean hasWrongType = null;
+		if(columnType != ColumnType.BLANK){
+			int totalProceded = 0;
+			
+			Map<ColumnType, Integer> sortedTypeMap = MyUtils.sortByValues((HashMap<ColumnType, Integer>)typeMap);
+			SortedSet<ColumnType> columnTypeSet = sortedTypeMap.keySet();
+			Iterator iterator = columnTypeSet.iterator();
+			int index = 0;
+			while(iterator.hasNext()) {
+		    	ColumnType next = (ColumnType)iterator.next();
+		    		//next = (ColumnType)iterator.next();
+				totalProceded = totalProceded + next.getValue();
+		    }
+		}
+		return hasWrongType; 
+	}
+*/	
+	
+	
 
 	//TODO fix use MyUtils.isCellEmpty(cell)
-	private boolean particularlyFilled(Set<ColumnType> columnTypeSet, ColumnType next) {
-		return next == ColumnType.BLANK && columnTypeSet.size()>1;
+	public boolean particularlyFilled(Set<ColumnType> columnTypeSet, ColumnType next) {
+		return columnTypeSet.size() > 1 && next == ColumnType.BLANK;
 	}
 
 	public boolean isMinMaxRemovingApplicable() {
