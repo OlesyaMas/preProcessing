@@ -315,13 +315,13 @@ public class ProcI {
 					JOptionPane.showMessageDialog(frame, "Виберіть документ !");
 					return;
 				}
-				
+
+				//long start = System.currentTimeMillis();
 				Date begin = new Date();
 				Processing.readFromExcel(inputFileFullName, outputFile);
 				Date finish = new Date();
 				
-		    	//SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yy:HH:mm:SS");
-		    	SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm:SS");
+		    	SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("mm:ss");
 		        String resultTime = DATE_FORMAT.format(finish.getTime() - begin.getTime());
 
 		        String message = "Документ опрацьовано за " + resultTime + "!";

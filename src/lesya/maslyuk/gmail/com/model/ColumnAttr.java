@@ -115,9 +115,7 @@ public class ColumnAttr {
 	}
 */	
 	
-	
 
-	//TODO fix use MyUtils.isCellEmpty(cell)
 	public boolean particularlyFilled(Set<ColumnType> columnTypeSet, ColumnType next) {
 		return columnTypeSet.size() > 1 && next == ColumnType.BLANK;
 	}
@@ -126,7 +124,6 @@ public class ColumnAttr {
 		return isColNumCalculatable() && typeMap.get(getColumnType()) >= MINMAX_REMOVING_ROWS;
 	}
 	
-	//TODO use counts
 	public boolean isColumnOrdinal(){
 		boolean isOrdinal = false;
 		int rowProceded = 0;
@@ -141,7 +138,7 @@ public class ColumnAttr {
 		return isOrdinal;
 	} 
 	
-	//TODO add FACTOR
+
 	public boolean isColumnCodeable(){
 		boolean isCodeable = false;
 		if(getColumnType() == ColumnType.TEXT){
@@ -152,8 +149,11 @@ public class ColumnAttr {
 		}
 		return isCodeable;
 	}
+
 	
-	
+	public boolean isColNumCalculatable() {
+		return getColumnType() == ColumnType.DECIMAL || (getColumnType() == ColumnType.INTEGER && !isColumnOrdinal());
+	}
 	
 	
 	public Map<ColumnType, Integer> getTypeMap() {
@@ -173,13 +173,6 @@ public class ColumnAttr {
 		this.codingMap = codingMap;
 	}
 
-
-	public boolean isColNumCalculatable() {
-		//return columnAttr.getColumnType() == ColumnType.DECIMAL || (columnAttr.getColumnType() == ColumnType.INTEGER && !columnAttr.isColumnOrdinal());
-		return getColumnType() == ColumnType.DECIMAL || (getColumnType() == ColumnType.INTEGER && !isColumnOrdinal());
-	}
-	
-		
 	@Override
 	public String toString() {
 		return "ColumnAttr [index=" + index + ", columnType=" + columnType + ", typeMap=" + typeMap + "]";
